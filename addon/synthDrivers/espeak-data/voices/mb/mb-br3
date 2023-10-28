@@ -1,0 +1,15 @@
+language pt 7
+name brazil-mbrola-3
+phonemes mb-brx
+gender male
+pitch 80 120
+stressLength 360 380 430 380 0 0 450 470
+
+
+dictrules 2 3 4
+voicing 180
+
+mbrola br3 ptbr_phtrans 22050
+tunes s6 c6 q6 e6
+replace 00 tS t
+

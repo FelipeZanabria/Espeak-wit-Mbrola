@@ -1,0 +1,10 @@
+language es 7
+name spanish-mbrola-3
+gender female
+pitch 210 320
+stressLength 370 380 430 380 0 0 420 400
+
+tunes s6 c6 q6 e6
+mbrola es3 es3_phtrans
+voicing 100
+

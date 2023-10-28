@@ -1,0 +1,14 @@
+language es-vz 7
+language es  8
+name venezuala-mbrola-1
+gender male
+pitch 82 117
+
+mbrola vz1 vz_phtrans
+
+stressLength 360 380 430 380 0 0 450 470
+tunes s6 c6 q6 e6
+
+dictrules 3
+replace 00 T s
+

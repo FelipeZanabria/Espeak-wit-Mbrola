@@ -1,0 +1,14 @@
+language pt 7
+name brazil-mbrola-4
+phonemes mb-brx
+gender female
+stressLength 360 380 430 380 0 0 450 470
+
+pitch 170 270
+voicing 80
+
+dictrules 2 3 4
+
+mbrola br4 ptbr4_phtrans
+tunes s6 c6 q6 e6
+replace 00 tS t

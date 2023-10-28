@@ -1,0 +1,13 @@
+language es-mx 7
+language es  8
+name mexican-mbrola-2
+gender male
+pitch 82 117
+
+mbrola mx2 mx2_phtrans
+
+stressLength 360 380 430 380 0 0 450 470
+tunes s6 c6 q6 e6
+
+replace 00 T s
+

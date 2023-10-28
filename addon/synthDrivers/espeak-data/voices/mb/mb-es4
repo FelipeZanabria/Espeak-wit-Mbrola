@@ -1,0 +1,9 @@
+language es 7
+name spanish-mbrola-4
+gender male
+pitch 120 177
+stressLength 360 380 430 380 0 0 450 470
+tunes s6 c6 q6 e6
+mbrola es4 es4_phtrans 16000
+voicing 80
+

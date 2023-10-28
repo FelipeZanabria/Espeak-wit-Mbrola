@@ -11,19 +11,29 @@ from . import _espeak_mb
 import threading
 import languageHandler
 from synthDriverHandler import SynthDriver, VoiceInfo, synthIndexReached, synthDoneSpeaking
-import speech
 from logHandler import log
 
-from speech.commands import (
-	IndexCommand,
-	CharacterModeCommand,
-	LangChangeCommand,
-	BreakCommand,
-	PitchCommand,
-	RateCommand,
-	VolumeCommand,
-	PhonemeCommand,
-)
+try:
+	from speech.commands import (
+		IndexCommand,
+		CharacterModeCommand,
+		BreakCommand,
+		PitchCommand,
+		RateCommand,
+		VolumeCommand,
+		PhonemeCommand,
+	)
+except ImportError:
+	from speech import (
+		IndexCommand,
+		CharacterModeCommand,
+		BreakCommand,
+		PitchCommand,
+		RateCommand,
+		VolumeCommand,
+		PhonemeCommand,
+	)
+
 
 class SynthDriver(SynthDriver):
 	name = "espeakwithmbrola"
@@ -40,7 +50,6 @@ class SynthDriver(SynthDriver):
 	supportedCommands = {
 		IndexCommand,
 		CharacterModeCommand,
-		LangChangeCommand,
 		BreakCommand,
 		PitchCommand,
 		RateCommand,

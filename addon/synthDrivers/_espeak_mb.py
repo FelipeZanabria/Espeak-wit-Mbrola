@@ -1,4 +1,4 @@
-﻿# -*- coding: UTF-8 -*-
+# -*- coding: UTF-8 -*-
 # A part of NonVisual Desktop Access (NVDA)
 # Copyright (C) 2007-2020 NV Access Limited, Peter Vágner
 # This file is covered by the GNU General Public License.
@@ -178,28 +178,19 @@ def callback(wav,numsamples,event):
 			onIndexReached(None)
 			isSpeaking = False
 			return CALLBACK_CONTINUE_SYNTHESIS
+		wav = string_at(wav, numsamples * sizeof(c_short)) if numsamples>0 else b""
 		prevByte = 0
-		length = numsamples * sizeof(c_short)
 		for indexNum, indexByte in indexes:
-			# Sometimes, rate boost can result in spurious index values.
-			if indexByte < 0:
-				indexByte = 0
-			elif indexByte > length:
-				indexByte = length
-			player.feed(
-				c_void_p(wav + prevByte),
-				size=indexByte - prevByte,
-				onDone=lambda indexNum=indexNum: onIndexReached(indexNum)
-			)
+			player.feed(wav[prevByte:indexByte],
+				onDone=lambda indexNum=indexNum: onIndexReached(indexNum))
 			prevByte = indexByte
 			if not isSpeaking:
 				return CALLBACK_ABORT_SYNTHESIS
-		player.feed(c_void_p(wav + prevByte), size=length - prevByte)
-		_numBytesPushed += length
+		player.feed(wav[prevByte:])
+		_numBytesPushed += len(wav)
 		return CALLBACK_CONTINUE_SYNTHESIS
 	except:
 		log.error("callback", exc_info=True)
-
 class BgThread(threading.Thread):
 	def __init__(self):
 		super().__init__(name=f"{self.__class__.__module__}.{self.__class__.__qualname__}")

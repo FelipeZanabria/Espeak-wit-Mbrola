@@ -23,8 +23,7 @@ addon_info = {
 	"addon_summary": _("Espeak with Mbrola included"),
 	# Add-on description
 	# Translators: Long description to be shown for this add-on on add-on information from add-ons manager
-	"addon_description": _("""This is the old Espeak with Mbrola support ported in an addon for NVDA.
-It can span multiple lines."""),
+	"addon_description": _("""This is the old Espeak with Mbrola support ported in an addon for NVDA.""")
 	# version
 	"addon_version": "1.0",
 	# Author(s)

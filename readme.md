@@ -11,9 +11,9 @@ For Spanish, there are the 4 voices of Spain, the 2 of Mexico and the Venezuelan
 * It is lighter than the sapi5 version of Espeak.
 * Variant setting and language switching have been removed because they were problematic. The first changes the sample rate and the second changes to a voice outside of Mbrola.
 ## To add more Mbrola voices to the add-on ##
-1. Check the voices supported by Espeak in: NVDA configuration folder/adons/espeakWithMbrola/synthDrivers/espeak-data/voices/mb
+1. Check the voices supported by Espeak in: NVDA configuration folder/addons/espeakWithMbrola/synthDrivers/espeak-data/voices/mb
 2. Download the Mbrola databases you want from: (https://github.com/numediart/MBROLA-voices)
-3. Copy or move to the path: NVDA configuration folder/addons/synthDrivers/espeak-data/mbrola.
+3. Copy or move to the path: NVDA configuration folder/addons/espeakWithMbrola/synthDrivers/espeak-data/mbrola.
 ## Known Issues ##
 * Change pitch  for caps does not work when using a Mbrola voice. The sapi5 version changes the pitch in the text following the letter
 * At the end of some sentences there may be small glitches in the male voices, which I think may be because there is not enough silence for Mbrola to breathe. I have done some tests with the Serpro Liane tts program with 1 ms pauses and this happens.

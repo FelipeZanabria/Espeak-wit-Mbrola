@@ -27,7 +27,7 @@ addon_info = {
 	# version
 	"addon_version": "1.0.0",
 	# Author(s)
-	"addon_author": "Felipe Porciuncula Zanabria <felipepzanabria@gmail.com.com>",
+	"addon_author": "Felipe Porciuncula Zanabria <felipepzanabria@gmail.com>",
 	# URL for the add-on documentation support
 	"addon_url": None,
 	# URL for the add-on repository where the source code can be found

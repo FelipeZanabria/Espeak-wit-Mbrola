@@ -1,4 +1,4 @@
-﻿# -*- coding: UTF-8 -*-
+# -*- coding: UTF-8 -*-
 #Copyright (C) 2023 - 2024 Felipe Porciuncula Zanabria, released under the GPL.
 
 import config, globalVars, os, shutil, addonHandler

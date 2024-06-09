@@ -1,41 +1,35 @@
 ﻿# -*- coding: UTF-8 -*-
-#synthDrivers/espeak.py
-#A part of NonVisual Desktop Access (NVDA)
-#Copyright (C) 2007-2019 NV Access Limited, Peter Vágner, Aleksey Sadovoy, Leonard de Ruijter
-#This file is covered by the GNU General Public License.
-#See the file COPYING for more details.
+# A part of NonVisual Desktop Access (NVDA)
+# Copyright (C) 2007-2024 NV Access Limited, Peter Vágner, Aleksey Sadovoy, Leonard de Ruijter and Felipe Porciuncula Zanabria
+# This file is covered by the GNU General Public License.
+# See the file COPYING for more details.
 
 import os
 from collections import OrderedDict
+from typing import (
+	Dict,
+	List,
+	Optional,
+	Set,
+)
+
 from . import _espeak_mb
-import threading
 import languageHandler
 from synthDriverHandler import SynthDriver, VoiceInfo, synthIndexReached, synthDoneSpeaking
+import speech
 from logHandler import log
 
-try:
-	from speech.commands import (
-		IndexCommand,
-		CharacterModeCommand,
-		BreakCommand,
-		PitchCommand,
-		RateCommand,
-		VolumeCommand,
-		LangChangeCommand,
-		PhonemeCommand,
-	)
-except ImportError:
-	from speech import (
-		IndexCommand,
-		CharacterModeCommand,
-		BreakCommand,
-		PitchCommand,
-		RateCommand,
-		VolumeCommand,
-		LangChangeCommand,
-		PhonemeCommand,
-	)
-
+from speech.types import SpeechSequence
+from speech.commands import (
+	IndexCommand,
+	CharacterModeCommand,
+	BreakCommand,
+	PitchCommand,
+	RateCommand,
+	VolumeCommand,
+	LangChangeCommand,
+	PhonemeCommand,
+)
 
 class SynthDriver(SynthDriver):
 	name = "espeakwithmbrola"
@@ -87,7 +81,7 @@ class SynthDriver(SynthDriver):
 		RateCommand: "rate",
 	}
 
-	IPA_TO_espeak = {
+	IPA_to_espeak = {
 		u"θ": u"T",
 		u"s": u"s",
 		u"ˈ": u"'",
@@ -102,9 +96,13 @@ class SynthDriver(SynthDriver):
 			0x5B: u" [", # [: [[ indicates phonemes
 		})
 
-	def speak(self,speechSequence):
-		textList=[]
-		prosody={}
+
+	# C901 'speak' is too complex
+	# Note: when working on speak, look for opportunities to simplify
+	# and move logic out into smaller helper functions.
+	def speak(self, speechSequence: SpeechSequence):  # noqa: C901
+		textList: List[str] = []
+		prosody: Dict[str, int] = {}
 		# We output malformed XML, as we might close an outer tag after opening an inner one; e.g.
 		# <voice><prosody></voice></prosody>.
 		# However, eSpeak doesn't seem to mind.
@@ -141,7 +139,7 @@ class SynthDriver(SynthDriver):
 			elif isinstance(item, PhonemeCommand):
 				# We can't use str.translate because we want to reject unknown characters.
 				try:
-					phonemes="".join([self.IPA_TO_espeak[char] for char in item.ipa])
+					phonemes="".join([self.IPA_to_espeak[char] for char in item.ipa])
 					# There needs to be a space after the phoneme command.
 					# Otherwise, eSpeak will announce a subsequent SSML tag instead of processing it.
 					textList.append(u"[[%s]] "%phonemes)
@@ -151,7 +149,6 @@ class SynthDriver(SynthDriver):
 						textList.append(self._processText(item.text))
 			else:
 				log.error("Unknown speech: %s"%item)
-		# Close any open tags.
 		if prosody:
 			textList.append("</prosody>")
 		text=u"".join(textList)
@@ -204,10 +201,10 @@ class SynthDriver(SynthDriver):
 		val=self._percentToParam(val, _espeak_mb.minPitch, _espeak_mb.maxPitch)
 		_espeak_mb.setParameter(_espeak_mb.espeakRANGE,val,0)
 
-	def _get_volume(self):
+	def _get_volume(self) -> int:
 		return _espeak_mb.getParameter(_espeak_mb.espeakVOLUME,1)
 
-	def _set_volume(self,volume):
+	def _set_volume(self, volume: int):
 		_espeak_mb.setParameter(_espeak_mb.espeakVOLUME,volume,0)
 
 	def _getAvailableVoices(self):
@@ -239,7 +236,7 @@ class SynthDriver(SynthDriver):
 			identifier=os.path.basename(identifier)
 		self._voice=identifier
 		try:
-			_espeak_mb.setVoiceAndVariant(voice=identifier,variant="None")
+			_espeak_mb.setVoiceAndVariant(voice=identifier,variant="NONE")
 		except:
 			self._voice=None
 			raise

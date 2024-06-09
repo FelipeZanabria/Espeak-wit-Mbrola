@@ -1,5 +1,10 @@
 # Espeak with Mbrola included #
-
+* Autor: Felipe Porciuncula Zanabria
+* Current version: 2.0 stable
+* NVDA compatibility: from 2019.3 onwards.
+* Download [for NVDA 2024.1](https://github.com/FelipeZanabria/Espeak-wit-Mbrola/releases/download/v2.0/espeakWitMbrola-2.0.nvda-addon)
+* Download [for NVDA 2023.3.4 and older](https://github.com/FelipeZanabria/Espeak-wit-Mbrola/releases/download/v1.0.5/espeakWitMbrola-1.0.5.nvda-addon)
+* [View source code on Github](https://github.com/FelipeZanabria/Espeak-wit-Mbrola)
 This is the old Espeak with Mbrola support ported in an addon for NVDA.
 
 ## Features ##

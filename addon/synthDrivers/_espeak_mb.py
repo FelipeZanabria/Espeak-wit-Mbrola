@@ -1,18 +1,17 @@
-# -*- coding: UTF-8 -*-
+﻿# -*- coding: UTF-8 -*-
 # A part of NonVisual Desktop Access (NVDA)
-# Copyright (C) 2007-2020 NV Access Limited, Peter Vágner
+# Copyright (C) 2007-2024 NV Access Limited, Peter Vágner and Felipe Porciuncula Zanabria
 # This file is covered by the GNU General Public License.
 # See the file COPYING for more details.
 
-import time
 import nvwave
 import threading
 import queue
-from ctypes import *
+from ctypes import (
+	byref, cdll, c_int, c_uint, c_char, c_char_p, c_byte, CFUNCTYPE, c_short, c_void_p, POINTER, sizeof, Structure, Union)
 import config
 from logHandler import log
 import os
-import codecs
 
 isSpeaking = False
 onIndexReached = None
@@ -178,23 +177,32 @@ def callback(wav,numsamples,event):
 			onIndexReached(None)
 			isSpeaking = False
 			return CALLBACK_CONTINUE_SYNTHESIS
-		wav = string_at(wav, numsamples * sizeof(c_short)) if numsamples>0 else b""
 		prevByte = 0
+		length = numsamples * sizeof(c_short)
 		for indexNum, indexByte in indexes:
-			player.feed(wav[prevByte:indexByte],
-				onDone=lambda indexNum=indexNum: onIndexReached(indexNum))
+			# Sometimes, rate boost can result in spurious index values.
+			if indexByte < 0:
+				indexByte = 0
+			elif indexByte > length:
+				indexByte = length
+			player.feed(
+				c_void_p(wav + prevByte),
+				size=indexByte - prevByte,
+				onDone=lambda indexNum=indexNum: onIndexReached(indexNum)
+			)
 			prevByte = indexByte
 			if not isSpeaking:
 				return CALLBACK_ABORT_SYNTHESIS
-		player.feed(wav[prevByte:])
-		_numBytesPushed += len(wav)
+		player.feed(c_void_p(wav + prevByte), size=length - prevByte)
+		_numBytesPushed += length
 		return CALLBACK_CONTINUE_SYNTHESIS
 	except:
 		log.error("callback", exc_info=True)
+
 class BgThread(threading.Thread):
 	def __init__(self):
 		super().__init__(name=f"{self.__class__.__module__}.{self.__class__.__qualname__}")
-		self.setDaemon(True)
+		self.daemon = True
 
 	def run(self):
 		global isSpeaking
@@ -254,7 +262,6 @@ def stop():
 		bgQueue.put(item)
 	isSpeaking = False
 	player.stop()
-
 
 def pause(switch):
 	global player
@@ -333,9 +340,9 @@ def initialize(indexCallback=None):
 		It is called with one argument:
 		the number of the index or C{None} when speech stops.
 	"""
-	global espeakDLL, mbrola, bgThread, bgQueue, player, onIndexReached
-	espeakDLL = cdll.LoadLibrary(os.path.join(os.path.abspath(os.path.dirname(__file__)), "espeak.dll"))
-	mbrola = cdll.LoadLibrary(os.path.join(os.path.abspath(os.path.dirname(__file__)), "mbrola.dll"))
+	global espeakDLL, bgThread, bgQueue, player, onIndexReached
+	espeakDLL = cdll.LoadLibrary(os.path.join(os.path.dirname(__file__), "espeak.dll"))
+	cdll.LoadLibrary(os.path.join(os.path.dirname(__file__), "mbrola.dll"))
 	espeakDLL.espeak_Info.restype=c_char_p
 	espeakDLL.espeak_Synth.errcheck=espeak_errcheck
 	espeakDLL.espeak_SetVoiceByName.errcheck=espeak_errcheck
@@ -369,7 +376,7 @@ def initialize(indexCallback=None):
 
 
 def terminate():
-	global bgThread, bgQueue, player, mbrola, espeakDLL , onIndexReached
+	global bgThread, bgQueue, player, espeakDLL , onIndexReached
 	stop()
 	bgQueue.put((None, None, None))
 	bgThread.join()
@@ -386,7 +393,7 @@ def info():
 	return espeakDLL.espeak_Info(None).decode()
 
 def getVariantDict():
-	dir = os.path.join(os.path.dirname(__file__),  "espeak-data", "voices", "!v")
+	dir = os.path.join(os.path.dirname(__file__), "espeak-data", "voices", "!v")
 	# Translators: name of the default espeak varient.
 	variantDict={"none": pgettext("espeakVarient", "none")}
 	for fileName in os.listdir(dir):
@@ -410,3 +417,4 @@ def getVariantDict():
 		if name is not None:
 			variantDict[fileName]=name
 	return variantDict
+

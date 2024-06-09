@@ -21,6 +21,7 @@ try:
 		PitchCommand,
 		RateCommand,
 		VolumeCommand,
+		LangChangeCommand,
 		PhonemeCommand,
 	)
 except ImportError:
@@ -31,6 +32,7 @@ except ImportError:
 		PitchCommand,
 		RateCommand,
 		VolumeCommand,
+		LangChangeCommand,
 		PhonemeCommand,
 	)
 
@@ -66,8 +68,12 @@ class SynthDriver(SynthDriver):
 		_espeak_mb.initialize(self._onIndexReached)
 		log.info("Using eSpeak with Mbrola version %s" % _espeak_mb.info())
 		lang=languageHandler.getLanguage()
-		_espeak_mb.setVoiceByLanguage(lang)
-		self._language=lang
+		try:
+			_espeak_mb.setVoiceByLanguage(lang)
+			self._language=lang
+		except RuntimeError:
+			_espeak_mb.setVoiceByLanguage('en')
+			self._language= 'en'
 		self.rate=30
 		self.pitch=50
 		self.inflection=50
@@ -109,6 +115,8 @@ class SynthDriver(SynthDriver):
 				textList.append("<mark name=\"%d\" />"%item.index)
 			elif isinstance(item, CharacterModeCommand):
 				textList.append("<say-as interpret-as=\"characters\">" if item.state else "</say-as>")
+			elif isinstance(item, LangChangeCommand):
+				continue
 			elif isinstance(item, BreakCommand):
 				textList.append(f'<break time="{item.time}ms" />')
 			elif type(item) in self.PROSODY_ATTRS:
@@ -133,7 +141,7 @@ class SynthDriver(SynthDriver):
 			elif isinstance(item, PhonemeCommand):
 				# We can't use str.translate because we want to reject unknown characters.
 				try:
-					phonemes="".join([self.IPA_TO_espeak_mb[char] for char in item.ipa])
+					phonemes="".join([self.IPA_TO_espeak[char] for char in item.ipa])
 					# There needs to be a space after the phoneme command.
 					# Otherwise, eSpeak will announce a subsequent SSML tag instead of processing it.
 					textList.append(u"[[%s]] "%phonemes)
@@ -245,5 +253,4 @@ class SynthDriver(SynthDriver):
 
 	def terminate(self):
 		_espeak_mb.terminate()
-
 
